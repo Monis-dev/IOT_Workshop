@@ -3,21 +3,21 @@ const path = require("path");
 const app = express();
 
 app.use(express.json());
-// Serve the frontend HTML file
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(__dirname)); // Serves the HTML file
 
 let tiltValue = 0;
 
-// Phone sends data here
+// Phone sends Gyro data here
 app.post("/update", (req, res) => {
   tiltValue = req.body.tilt;
   res.sendStatus(200);
 });
 
-// ESP8266 requests data from here
+// ESP8266 gets Gyro data from here
 app.get("/get", (req, res) => {
   res.json({ tilt: tiltValue });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Wave Server running on port ${PORT}`));
+app.listen(process.env.PORT || 3000, () =>
+  console.log("Fluid Server Running!"),
+);

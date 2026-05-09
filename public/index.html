@@ -1,53 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fluid Controller</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #0f172a; color: white; margin: 0; }
-        button { padding: 20px 40px; font-size: 20px; background: #0ea5e9; color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4); }
-        h1 { font-size: 4rem; margin: 20px 0; color: #38bdf8; }
+      body {
+        background: #111;
+        color: #0df;
+        font-family: sans-serif;
+        text-align: center;
+        padding-top: 50px;
+      }
+      button {
+        padding: 20px;
+        font-size: 20px;
+        background: #0df;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+      }
     </style>
-</head>
-<body>
-    <button id="btn" onclick="startGyro()">CONNECT GYROSCOPE</button>
-    <h1 id="tilt-display">0°</h1>
-    <p>Tilt your phone left and right</p>
+  </head>
+  <body>
+    <button id="btn" onclick="startGyro()">CONNECT GYRO</button>
+    <h1 id="tilt">0°</h1>
 
     <script>
-        let lastSendTime = 0;
-
-        async function startGyro() {
-            // Request permission for iOS devices
-            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                const permission = await DeviceOrientationEvent.requestPermission();
-                if (permission !== 'granted') return alert("Permission denied!");
-            }
-            
-            document.getElementById('btn').style.display = 'none';
-
-            window.addEventListener("deviceorientation", (event) => {
-                let tilt = Math.round(event.gamma || 0); // Left/Right tilt
-                
-                // Limit tilt range to -45 to 45 degrees
-                if (tilt > 45) tilt = 45;
-                if (tilt < -45) tilt = -45;
-
-                document.getElementById('tilt-display').innerText = tilt + "°";
-
-                // THROTTLE: Only send data to Render once every 250ms
-                const now = Date.now();
-                if (now - lastSendTime > 250) {
-                    lastSendTime = now;
-                    fetch('/update', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ tilt: tilt })
-                    }).catch(e => console.log("Network error"));
-                }
-            });
+      let lastSend = 0;
+      async function startGyro() {
+        if (typeof DeviceOrientationEvent.requestPermission === "function") {
+          await DeviceOrientationEvent.requestPermission();
         }
+        document.getElementById("btn").style.display = "none";
+
+        window.addEventListener("deviceorientation", (e) => {
+          let tilt = Math.round(e.gamma || 0); // Left/Right tilt
+          if (tilt > 45) tilt = 45; // Max tilt right
+          if (tilt < -45) tilt = -45; // Max tilt left
+
+          document.getElementById("tilt").innerText = tilt + "°";
+
+          // Send to Render every 200ms (so we don't crash the server)
+          if (Date.now() - lastSend > 200) {
+            lastSend = Date.now();
+            fetch("/update", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ tilt: tilt }),
+            });
+          }
+        });
+      }
     </script>
-</body>
+  </body>
 </html>
