@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — SISTec IoT 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Share Tech Mono', monospace; background: #0a0f1e; }
+    .orbitron { font-family: 'Orbitron', sans-serif; }
+    .glow { box-shadow: 0 0 20px rgba(0,255,200,0.3), 0 0 60px rgba(0,255,200,0.1); }
+    .glow-text { text-shadow: 0 0 10px rgba(0,255,200,0.8); }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(0,255,200,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,200,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    input:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px #0d1a2e inset !important;
+      -webkit-text-fill-color: #00ffc8 !important;
+    }
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(0,255,200,0.4); }
+      50% { border-color: rgba(0,255,200,0.9); }
+    }
+    .pulse-border { animation: pulse-border 2s ease-in-out infinite; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.6s ease forwards; }
+  </style>
+</head>
+<body class="grid-bg min-h-screen flex items-center justify-center px-4 py-10">
+
+  <div class="w-full max-w-md fade-in">
+
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <div class="inline-block mb-4">
+        <span class="text-xs text-cyan-400 tracking-[0.4em] uppercase">SISTec IoT Application</span>
+      </div>
+      <h1 class="orbitron text-3xl font-black glow-text" style="color:#00ffc8">2026</h1>
+      <div class="mt-2 h-px w-32 mx-auto" style="background: linear-gradient(90deg, transparent, #00ffc8, transparent)"></div>
+    </div>
+
+    <!-- Card -->
+    <div class="rounded-2xl border p-8 glow pulse-border" style="background: rgba(13,26,46,0.95); border-color: rgba(0,255,200,0.4);">
+      <h2 class="orbitron text-xl font-bold text-white mb-1">NEW USER REGISTRATION</h2>
+      <p class="text-xs mb-8" style="color: rgba(0,255,200,0.5)">Create your access credentials</p>
+
+      <div id="msg" class="hidden mb-4 text-sm rounded px-3 py-2 border"></div>
+
+      <!-- Name -->
+      <div class="mb-5">
+        <label class="block text-xs mb-2 tracking-widest uppercase" style="color:#00ffc8">Full Name</label>
+        <input id="name" type="text" placeholder="Your Name"
+          class="w-full rounded-lg px-4 py-3 text-sm outline-none border transition-all duration-300"
+          style="background:#0d1a2e; border-color:rgba(0,255,200,0.3); color:#00ffc8;"
+          onfocus="this.style.boxShadow='0 0 15px rgba(0,255,200,0.2)'; this.style.borderColor='rgba(0,255,200,0.8)'"
+          onblur="this.style.boxShadow='none'; this.style.borderColor='rgba(0,255,200,0.3)'"/>
+      </div>
+
+      <!-- Email -->
+      <div class="mb-5">
+        <label class="block text-xs mb-2 tracking-widest uppercase" style="color:#00ffc8">Email Address</label>
+        <input id="email" type="email" placeholder="you@example.com"
+          class="w-full rounded-lg px-4 py-3 text-sm outline-none border transition-all duration-300"
+          style="background:#0d1a2e; border-color:rgba(0,255,200,0.3); color:#00ffc8;"
+          onfocus="this.style.boxShadow='0 0 15px rgba(0,255,200,0.2)'; this.style.borderColor='rgba(0,255,200,0.8)'"
+          onblur="this.style.boxShadow='none'; this.style.borderColor='rgba(0,255,200,0.3)'"/>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-8">
+        <label class="block text-xs mb-2 tracking-widest uppercase" style="color:#00ffc8">Password</label>
+        <input id="password" type="password" placeholder="Min 6 characters"
+          class="w-full rounded-lg px-4 py-3 text-sm outline-none border transition-all duration-300"
+          style="background:#0d1a2e; border-color:rgba(0,255,200,0.3); color:#00ffc8;"
+          onfocus="this.style.boxShadow='0 0 15px rgba(0,255,200,0.2)'; this.style.borderColor='rgba(0,255,200,0.8)'"
+          onblur="this.style.boxShadow='none'; this.style.borderColor='rgba(0,255,200,0.3)'"
+          onkeydown="if(event.key==='Enter') register()"/>
+      </div>
+
+      <!-- Button -->
+      <button onclick="register()" id="regBtn"
+        class="orbitron w-full py-3 rounded-lg font-bold text-sm tracking-widest uppercase transition-all duration-300"
+        style="background: linear-gradient(135deg, #00ffc8, #00a8ff); color:#0a0f1e;"
+        onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 0 30px rgba(0,255,200,0.5)'"
+        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+        CREATE ACCOUNT
+      </button>
+
+      <p class="text-center text-xs mt-6" style="color:rgba(255,255,255,0.4)">
+        Already registered?
+        <a href="/" class="underline" style="color:#00ffc8"
+          onmouseover="this.style.color='#00a8ff'" onmouseout="this.style.color='#00ffc8'">
+          Login here
+        </a>
+      </p>
+    </div>
+
+    <p class="text-center text-xs mt-6" style="color:rgba(0,255,200,0.2)">
+      SISTec IoT Application © 2026
+    </p>
+  </div>
+
+  <script>
+    fetch('/auth/me').then(r => r.json()).then(d => {
+      if (d.loggedIn) window.location.href = '/dashboard';
+    });
+
+    async function register() {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('regBtn');
+
+      if (!name || !email || !password) {
+        showMsg('Please fill in all fields', 'error');
+        return;
+      }
+      if (password.length < 6) {
+        showMsg('Password must be at least 6 characters', 'error');
+        return;
+      }
+
+      btn.textContent = 'CREATING...';
+      btn.disabled = true;
+
+      const res = await fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showMsg('Account created! Redirecting to login...', 'success');
+        setTimeout(() => window.location.href = '/', 1500);
+      } else {
+        showMsg(data.message || 'Registration failed', 'error');
+        btn.textContent = 'CREATE ACCOUNT';
+        btn.disabled = false;
+      }
+    }
+
+    function showMsg(text, type) {
+      const msg = document.getElementById('msg');
+      msg.textContent = text;
+      msg.className = 'mb-4 text-sm rounded px-3 py-2 border';
+      if (type === 'error') {
+        msg.style.cssText = 'color:#ff4a4a; border-color:rgba(255,74,74,0.4); background:rgba(255,74,74,0.1); margin-bottom:1rem; font-size:0.875rem; border-radius:0.375rem; padding:0.5rem 0.75rem;';
+      } else {
+        msg.style.cssText = 'color:#00ffc8; border-color:rgba(0,255,200,0.4); background:rgba(0,255,200,0.1); margin-bottom:1rem; font-size:0.875rem; border-radius:0.375rem; padding:0.5rem 0.75rem;';
+      }
+      msg.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
