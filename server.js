@@ -5,13 +5,13 @@ const app = express();
 app.use(express.json());
 
 // Tell the server to serve the frontend files
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, "public")));
 
 let tiltValue = 0;
 
 // 1. Explicitly serve the HTML page when you open the URL
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // 2. Phone sends Gyro data here
