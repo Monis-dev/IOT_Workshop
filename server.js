@@ -13,7 +13,6 @@ const LCD_FILE = path.join(__dirname, "lcd.txt");
 
 // ─── Init DB if not exists ────────────────────────────────────────────────────
 if (!fs.existsSync(DB_FILE)) {
-  // Added predictions array to initial schema
   fs.writeFileSync(
     DB_FILE,
     JSON.stringify({ users: [], sensors: [], predictions: [] }, null, 2),
@@ -100,6 +99,7 @@ app.post("/auth/logout", (req, res) => {
   req.session.destroy();
   res.json({ success: true });
 });
+
 app.get("/auth/me", (req, res) => {
   res.json(
     req.session.user
@@ -122,13 +122,11 @@ app.get("/api/records", requireLogin, (req, res) => {
   res.json({ success: true, data: db.sensors });
 });
 
-// Added for Notebook Step 2: Fetch all records for training
 app.get("/data/all", (req, res) => {
   const db = readDB();
   res.json({ success: true, count: db.sensors.length, data: db.sensors });
 });
 
-// Added for Notebook Step 8: Receive predictions from Colab
 app.post("/data/predictions", (req, res) => {
   const { secret, predicted_temp, model, mae, r2, predicted_at, for_time } =
     req.body;
@@ -145,12 +143,11 @@ app.post("/data/predictions", (req, res) => {
     predicted_at,
     for_time,
   };
-  db.predictions = [predictionRecord]; // Keep only the latest prediction
+  db.predictions = [predictionRecord];
   writeDB(db);
   res.json({ success: true, message: "Prediction updated" });
 });
 
-// Added for Dashboard UI: Get the latest prediction
 app.get("/api/prediction/latest", requireLogin, (req, res) => {
   const db = readDB();
   res.json({
@@ -181,15 +178,24 @@ app.post("/api/lcd-text", requireLogin, (req, res) => {
 app.get("/api/sensor", (req, res) => {
   const { temp, hum, key } = req.query;
   if (key !== "sistec2026") return res.status(403).send("FORBIDDEN");
+
+  // FIX: Protect DB from crashing if the NodeMCU sends empty/invalid values
+  const parsedTemp = parseFloat(temp);
+  const parsedHum = parseFloat(hum);
+  if (isNaN(parsedTemp) || isNaN(parsedHum)) {
+    return res.status(400).send("BAD REQUEST: Invalid sensor values");
+  }
+
   const db = readDB();
   const { time, date } = getKolkataTime();
   db.sensors.push({
     id: Date.now(),
-    temperature: parseFloat(temp),
-    humidity: parseFloat(hum),
+    temperature: parsedTemp,
+    humidity: parsedHum,
     time,
     date,
   });
+
   if (db.sensors.length > 500) db.sensors = db.sensors.slice(-500);
   writeDB(db);
   res.send("OK");

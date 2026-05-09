@@ -36,26 +36,15 @@
         -webkit-text-fill-color: #00ffc8 !important;
       }
       @keyframes pulse-border {
-        0%,
-        100% {
-          border-color: rgba(0, 255, 200, 0.4);
-        }
-        50% {
-          border-color: rgba(0, 255, 200, 0.9);
-        }
+        0%, 100% { border-color: rgba(0, 255, 200, 0.4); }
+        50% { border-color: rgba(0, 255, 200, 0.9); }
       }
       .pulse-border {
         animation: pulse-border 2s ease-in-out infinite;
       }
       @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
       }
       .fade-in {
         animation: fadeIn 0.6s ease forwards;
@@ -79,34 +68,21 @@
         </h1>
         <div
           class="mt-2 h-px w-32 mx-auto"
-          style="
-            background: linear-gradient(
-              90deg,
-              transparent,
-              #00ffc8,
-              transparent
-            );
-          "
+          style="background: linear-gradient(90deg, transparent, #00ffc8, transparent);"
         ></div>
       </div>
 
       <!-- Card -->
       <div
         class="rounded-2xl border p-8 glow pulse-border"
-        style="
-          background: rgba(13, 26, 46, 0.95);
-          border-color: rgba(0, 255, 200, 0.4);
-        "
+        style="background: rgba(13, 26, 46, 0.95); border-color: rgba(0, 255, 200, 0.4);"
       >
         <h2 class="orbitron text-xl font-bold text-white mb-1">SYSTEM LOGIN</h2>
         <p class="text-xs mb-8" style="color: rgba(0, 255, 200, 0.5)">
           Authorized personnel only
         </p>
 
-        <div
-          id="msg"
-          class="hidden mb-4 text-sm rounded px-3 py-2 border"
-        ></div>
+        <div id="msg" class="hidden mb-4 text-sm rounded px-3 py-2 border"></div>
 
         <!-- Email -->
         <div class="mb-5">
@@ -120,11 +96,7 @@
             type="email"
             placeholder="you@example.com"
             class="w-full rounded-lg px-4 py-3 text-sm outline-none border transition-all duration-300 focus:border-cyan-400"
-            style="
-              background: #0d1a2e;
-              border-color: rgba(0, 255, 200, 0.3);
-              color: #00ffc8;
-            "
+            style="background: #0d1a2e; border-color: rgba(0, 255, 200, 0.3); color: #00ffc8;"
             onfocus="this.style.boxShadow = '0 0 15px rgba(0,255,200,0.2)'"
             onblur="this.style.boxShadow = 'none'"
           />
@@ -142,11 +114,7 @@
             type="password"
             placeholder="••••••••"
             class="w-full rounded-lg px-4 py-3 text-sm outline-none border transition-all duration-300 focus:border-cyan-400"
-            style="
-              background: #0d1a2e;
-              border-color: rgba(0, 255, 200, 0.3);
-              color: #00ffc8;
-            "
+            style="background: #0d1a2e; border-color: rgba(0, 255, 200, 0.3); color: #00ffc8;"
             onfocus="this.style.boxShadow = '0 0 15px rgba(0,255,200,0.2)'"
             onblur="this.style.boxShadow = 'none'"
             onkeydown="if (event.key === 'Enter') login();"
@@ -158,26 +126,14 @@
           onclick="login()"
           id="loginBtn"
           class="orbitron w-full py-3 rounded-lg font-bold text-sm tracking-widest uppercase transition-all duration-300"
-          style="
-            background: linear-gradient(135deg, #00ffc8, #00a8ff);
-            color: #0a0f1e;
-          "
-          onmouseover="
-            this.style.transform = 'scale(1.02)';
-            this.style.boxShadow = '0 0 30px rgba(0,255,200,0.5)';
-          "
-          onmouseout="
-            this.style.transform = 'scale(1)';
-            this.style.boxShadow = 'none';
-          "
+          style="background: linear-gradient(135deg, #00ffc8, #00a8ff); color: #0a0f1e;"
+          onmouseover="this.style.transform = 'scale(1.02)'; this.style.boxShadow = '0 0 30px rgba(0,255,200,0.5)';"
+          onmouseout="this.style.transform = 'scale(1)'; this.style.boxShadow = 'none';"
         >
           ACCESS SYSTEM
         </button>
 
-        <p
-          class="text-center text-xs mt-6"
-          style="color: rgba(255, 255, 255, 0.4)"
-        >
+        <p class="text-center text-xs mt-6" style="color: rgba(255, 255, 255, 0.4)">
           No account?
           <a
             href="/register"
@@ -195,45 +151,9 @@
         SISTec IoT Application © 2026
       </p>
     </div>
-    <div
-      class="card p-8 fade-in"
-      style="animation-delay: 0.15s; border-color: rgba(0, 255, 200, 0.5)"
-    >
-      <div class="flex items-start justify-between mb-6">
-        <div>
-          <p
-            class="text-xs tracking-widest uppercase mb-1"
-            style="color: #00ffc8"
-          >
-            AI Prediction (T+5)
-          </p>
-          <p class="text-xs" style="color: rgba(255, 255, 255, 0.3)">
-            Linear Regression Model
-          </p>
-        </div>
-        <div class="text-2xl">🤖</div>
-      </div>
-      <div
-        class="big-value mb-2"
-        id="pred-value"
-        style="
-          background: linear-gradient(135deg, #00ffc8, #00a8ff);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        "
-      >
-        --
-      </div>
-      <div class="text-lg font-bold mb-4" style="color: #00ffc8">°C</div>
-      <div class="text-xs" style="color: rgba(255, 255, 255, 0.3)">
-        🔮 For:
-        <span id="pred-for-time" style="color: #00ffc8">--:-- --</span>
-        &nbsp;|&nbsp; Accuracy: <span id="pred-acc">--</span>%
-      </div>
-    </div>
 
     <script>
-      // Redirect if already logged in
+      // Automatically redirect to dashboard if the user is already logged in
       fetch("/auth/me")
         .then((r) => r.json())
         .then((d) => {
@@ -244,7 +164,6 @@
         const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
         const btn = document.getElementById("loginBtn");
-        const msg = document.getElementById("msg");
 
         if (!email || !password) {
           showMsg("Please fill in all fields", "error");
@@ -254,18 +173,24 @@
         btn.textContent = "AUTHENTICATING...";
         btn.disabled = true;
 
-        const res = await fetch("/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
-        const data = await res.json();
+        try {
+          const res = await fetch("/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          const data = await res.json();
 
-        if (data.success) {
-          showMsg("Access granted! Redirecting...", "success");
-          setTimeout(() => (window.location.href = "/dashboard"), 1000);
-        } else {
-          showMsg(data.message || "Login failed", "error");
+          if (data.success) {
+            showMsg("Access granted! Redirecting...", "success");
+            setTimeout(() => (window.location.href = "/dashboard"), 1000);
+          } else {
+            showMsg(data.message || "Login failed", "error");
+            btn.textContent = "ACCESS SYSTEM";
+            btn.disabled = false;
+          }
+        } catch (err) {
+          showMsg("Server error occurred.", "error");
           btn.textContent = "ACCESS SYSTEM";
           btn.disabled = false;
         }
@@ -284,44 +209,6 @@
         }
         msg.classList.remove("hidden");
       }
-      // New function to load AI predictions
-      async function loadPrediction() {
-        const res = await fetch("/api/prediction/latest");
-        const data = await res.json();
-
-        if (data.success && data.data) {
-          const p = data.data;
-          document.getElementById("pred-value").textContent =
-            p.predicted_temp.toFixed(2);
-          document.getElementById("pred-for-time").textContent = p.for_time;
-          // R2 score converted to percentage for accuracy
-          document.getElementById("pred-acc").textContent = (
-            p.r2 * 100
-          ).toFixed(1);
-        }
-      }
-
-      // Update the existing auth check/init block
-      fetch("/auth/me")
-        .then((r) => r.json())
-        .then((d) => {
-          if (!d.loggedIn) {
-            window.location.href = "/";
-          } else {
-            document.getElementById("username").textContent =
-              d.user.name.toUpperCase();
-            loadLatest();
-            loadRecords();
-            loadPrediction(); // Load initial prediction
-          }
-        });
-
-      // Update the existing auto-refresh interval
-      setInterval(() => {
-        loadLatest();
-        loadRecords();
-        loadPrediction(); // Refresh prediction every 30s
-      }, 30000);
     </script>
   </body>
-</html>
+</html> 
