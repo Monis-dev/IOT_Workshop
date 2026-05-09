@@ -3,27 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login — SISTec IoT 2026</title>
+    <title>Dashboard — SISTec IoT 2026</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    
     <style>
       body {
         font-family: "Share Tech Mono", monospace;
         background: #0a0f1e;
+        color: #e2e8f0;
       }
       .orbitron {
         font-family: "Orbitron", sans-serif;
-      }
-      .glow {
-        box-shadow:
-          0 0 20px rgba(0, 255, 200, 0.3),
-          0 0 60px rgba(0, 255, 200, 0.1);
-      }
-      .glow-text {
-        text-shadow: 0 0 10px rgba(0, 255, 200, 0.8);
       }
       .grid-bg {
         background-image:
@@ -31,184 +26,358 @@
           linear-gradient(90deg, rgba(0, 255, 200, 0.03) 1px, transparent 1px);
         background-size: 40px 40px;
       }
-      input:-webkit-autofill {
-        -webkit-box-shadow: 0 0 0 1000px #0d1a2e inset !important;
-        -webkit-text-fill-color: #00ffc8 !important;
+      .glow-box {
+        background: rgba(13, 26, 46, 0.95);
+        border: 1px solid rgba(0, 255, 200, 0.3);
+        box-shadow: 0 0 15px rgba(0, 255, 200, 0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
       }
-      @keyframes pulse-border {
-        0%, 100% { border-color: rgba(0, 255, 200, 0.4); }
-        50% { border-color: rgba(0, 255, 200, 0.9); }
+      .glow-box:hover {
+        border-color: rgba(0, 255, 200, 0.6);
+        box-shadow: 0 0 20px rgba(0, 255, 200, 0.2);
       }
-      .pulse-border {
-        animation: pulse-border 2s ease-in-out infinite;
+      .glow-text {
+        text-shadow: 0 0 10px rgba(0, 255, 200, 0.8);
       }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+      .neon-text-gradient {
+        background: linear-gradient(135deg, #00ffc8, #00a8ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
-      .fade-in {
-        animation: fadeIn 0.6s ease forwards;
-      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar-track { background: #0a0f1e; }
+      ::-webkit-scrollbar-thumb { background: #00ffc8; border-radius: 3px; }
     </style>
   </head>
-  <body class="grid-bg min-h-screen flex items-center justify-center px-4">
-    <div class="w-full max-w-md fade-in">
-      <!-- Header -->
-      <div class="text-center mb-10">
-        <div class="inline-block mb-4">
-          <span class="text-xs text-cyan-400 tracking-[0.4em] uppercase"
-            >SISTec IoT Application</span
-          >
-        </div>
-        <h1
-          class="orbitron text-3xl font-black text-white glow-text"
-          style="color: #00ffc8"
-        >
-          2026
+  
+  <body class="grid-bg min-h-screen p-4 md:p-8">
+    
+    <!-- Top Navigation -->
+    <header class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+      <div>
+        <h1 class="orbitron text-2xl font-black text-white glow-text" style="color: #00ffc8;">
+          SISTec IoT <span class="text-white">2026</span>
         </h1>
-        <div
-          class="mt-2 h-px w-32 mx-auto"
-          style="background: linear-gradient(90deg, transparent, #00ffc8, transparent);"
-        ></div>
+        <p class="text-xs text-cyan-400 tracking-widest uppercase mt-1">Command Center</p>
       </div>
-
-      <!-- Card -->
-      <div
-        class="rounded-2xl border p-8 glow pulse-border"
-        style="background: rgba(13, 26, 46, 0.95); border-color: rgba(0, 255, 200, 0.4);"
-      >
-        <h2 class="orbitron text-xl font-bold text-white mb-1">SYSTEM LOGIN</h2>
-        <p class="text-xs mb-8" style="color: rgba(0, 255, 200, 0.5)">
-          Authorized personnel only
-        </p>
-
-        <div id="msg" class="hidden mb-4 text-sm rounded px-3 py-2 border"></div>
-
-        <!-- Email -->
-        <div class="mb-5">
-          <label
-            class="block text-xs mb-2 tracking-widest uppercase"
-            style="color: #00ffc8"
-            >Email Address</label
-          >
-          <input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            class="w-full rounded-lg px-4 py-3 text-sm outline-none border transition-all duration-300 focus:border-cyan-400"
-            style="background: #0d1a2e; border-color: rgba(0, 255, 200, 0.3); color: #00ffc8;"
-            onfocus="this.style.boxShadow = '0 0 15px rgba(0,255,200,0.2)'"
-            onblur="this.style.boxShadow = 'none'"
-          />
+      <div class="flex items-center gap-6">
+        <div class="text-sm">
+          <span class="text-gray-500">USER://</span> 
+          <span id="username" class="text-white font-bold tracking-wider">LOADING...</span>
         </div>
-
-        <!-- Password -->
-        <div class="mb-8">
-          <label
-            class="block text-xs mb-2 tracking-widest uppercase"
-            style="color: #00ffc8"
-            >Password</label
-          >
-          <input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            class="w-full rounded-lg px-4 py-3 text-sm outline-none border transition-all duration-300 focus:border-cyan-400"
-            style="background: #0d1a2e; border-color: rgba(0, 255, 200, 0.3); color: #00ffc8;"
-            onfocus="this.style.boxShadow = '0 0 15px rgba(0,255,200,0.2)'"
-            onblur="this.style.boxShadow = 'none'"
-            onkeydown="if (event.key === 'Enter') login();"
-          />
-        </div>
-
-        <!-- Button -->
-        <button
-          onclick="login()"
-          id="loginBtn"
-          class="orbitron w-full py-3 rounded-lg font-bold text-sm tracking-widest uppercase transition-all duration-300"
-          style="background: linear-gradient(135deg, #00ffc8, #00a8ff); color: #0a0f1e;"
-          onmouseover="this.style.transform = 'scale(1.02)'; this.style.boxShadow = '0 0 30px rgba(0,255,200,0.5)';"
-          onmouseout="this.style.transform = 'scale(1)'; this.style.boxShadow = 'none';"
-        >
-          ACCESS SYSTEM
+        <button onclick="logout()" class="text-xs border border-red-500 text-red-500 px-4 py-2 rounded hover:bg-red-500 hover:text-white transition-colors duration-300">
+          TERMINATE SESSION
         </button>
+      </div>
+    </header>
 
-        <p class="text-center text-xs mt-6" style="color: rgba(255, 255, 255, 0.4)">
-          No account?
-          <a
-            href="/register"
-            class="underline transition-colors"
-            style="color: #00ffc8"
-            onmouseover="this.style.color = '#00a8ff'"
-            onmouseout="this.style.color = '#00ffc8'"
-          >
-            Register here
-          </a>
+    <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- 1. Temperature Card -->
+      <div class="glow-box rounded-xl p-6">
+        <div class="flex justify-between items-start mb-2">
+          <p class="text-xs tracking-widest uppercase" style="color: #00ffc8;">Live Temperature</p>
+          <span class="text-2xl">🌡️</span>
+        </div>
+        <div class="flex items-end gap-2">
+          <span id="temp-val" class="orbitron text-4xl font-bold neon-text-gradient">--</span>
+          <span class="text-lg font-bold" style="color: #00ffc8;">°C</span>
+        </div>
+        <p id="last-update" class="text-xs text-gray-500 mt-4">Last updated: --</p>
+      </div>
+
+      <!-- 2. Humidity Card -->
+      <div class="glow-box rounded-xl p-6">
+        <div class="flex justify-between items-start mb-2">
+          <p class="text-xs tracking-widest uppercase text-blue-400">Live Humidity</p>
+          <span class="text-2xl">💧</span>
+        </div>
+        <div class="flex items-end gap-2">
+          <span id="hum-val" class="orbitron text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">--</span>
+          <span class="text-lg font-bold text-blue-400">%</span>
+        </div>
+        <p id="last-update-hum" class="text-xs text-gray-500 mt-4">Last updated: --</p>
+      </div>
+
+      <!-- 3. AI Prediction Card -->
+      <div class="glow-box rounded-xl p-6" style="border-color: rgba(0, 255, 200, 0.6); box-shadow: 0 0 20px rgba(0, 255, 200, 0.15);">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <p class="text-xs tracking-widest uppercase" style="color: #00ffc8;">AI Prediction (T+5)</p>
+            <p class="text-[10px] text-gray-500">Linear Regression</p>
+          </div>
+          <span class="text-2xl animate-pulse">🤖</span>
+        </div>
+        <div class="flex items-end gap-2">
+          <span id="pred-val" class="orbitron text-4xl font-bold neon-text-gradient">--</span>
+          <span class="text-lg font-bold" style="color: #00ffc8;">°C</span>
+        </div>
+        <p class="text-xs mt-3 text-gray-400">
+          🔮 For: <span id="pred-time" style="color: #00ffc8;">--:--</span> | Acc: <span id="pred-acc">--</span>%
         </p>
       </div>
 
-      <p class="text-center text-xs mt-6" style="color: rgba(0, 255, 200, 0.2)">
-        SISTec IoT Application © 2026
-      </p>
-    </div>
+      <!-- 4. LCD Control Panel -->
+      <div class="glow-box rounded-xl p-6 md:col-span-1">
+        <h3 class="orbitron text-sm font-bold mb-4" style="color: #00ffc8;">LCD DISPLAY OVERRIDE</h3>
+        <p class="text-xs text-gray-400 mb-4">Transmit text directly to hardware (Max 16 chars).</p>
+        
+        <input 
+          type="text" 
+          id="lcd-input" 
+          maxlength="16" 
+          placeholder="ENTER COMMAND..."
+          class="w-full bg-[#0a0f1e] border border-cyan-800 rounded px-3 py-2 text-sm text-cyan-400 outline-none focus:border-cyan-400 mb-4 uppercase"
+        />
+        <button onclick="updateLCD()" class="w-full py-2 bg-cyan-900/40 border border-cyan-500 text-cyan-400 text-xs tracking-widest uppercase hover:bg-cyan-500 hover:text-[#0a0f1e] transition-colors rounded">
+          TRANSMIT DATA
+        </button>
+        <p id="lcd-status" class="text-xs mt-3 text-center hidden"></p>
+      </div>
 
+      <!-- 5. Chart area -->
+      <div class="glow-box rounded-xl p-6 md:col-span-2">
+        <h3 class="orbitron text-sm font-bold mb-4" style="color: #00ffc8;">SYSTEM TELEMETRY</h3>
+        <div class="w-full h-48 relative">
+          <canvas id="sensorChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 6. Data Table -->
+      <div class="glow-box rounded-xl p-6 md:col-span-3">
+        <h3 class="orbitron text-sm font-bold mb-4" style="color: #00ffc8;">DATA LOGS</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm whitespace-nowrap">
+            <thead class="text-xs tracking-widest text-cyan-600 uppercase border-b border-cyan-900">
+              <tr>
+                <th class="px-4 py-3">Timestamp</th>
+                <th class="px-4 py-3">Temp (°C)</th>
+                <th class="px-4 py-3">Hum (%)</th>
+                <th class="px-4 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="table-body" class="text-gray-300 divide-y divide-cyan-900/30">
+              <!-- JS Populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+    </main>
+
+    <!-- App Logic -->
     <script>
-      // Automatically redirect to dashboard if the user is already logged in
+      let myChart; // Chart instance
+
+      // 1. Authentication Check
       fetch("/auth/me")
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.loggedIn) window.location.href = "/dashboard";
+        .then(res => res.json())
+        .then(data => {
+          if (!data.loggedIn) {
+            window.location.href = "/"; // Redirect if not logged in
+          } else {
+            document.getElementById("username").textContent = data.user.name.toUpperCase();
+            initDashboard();
+          }
         });
 
-      async function login() {
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-        const btn = document.getElementById("loginBtn");
+      // Logout Function
+      async function logout() {
+        await fetch("/auth/logout", { method: "POST" });
+        window.location.href = "/";
+      }
 
-        if (!email || !password) {
-          showMsg("Please fill in all fields", "error");
+      // 2. Initialize Dashboard
+      function initDashboard() {
+        initChart();
+        refreshAllData();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(refreshAllData, 30000);
+      }
+
+      function refreshAllData() {
+        loadLatestSensorData();
+        loadHistoricalRecords();
+        loadAIPrediction();
+      }
+
+      // 3. Load Current Sensor Readings
+      async function loadLatestSensorData() {
+        try {
+          const res = await fetch("/api/latest");
+          const data = await res.json();
+          if (data.success && data.data) {
+            document.getElementById("temp-val").textContent = data.data.temperature.toFixed(1);
+            document.getElementById("hum-val").textContent = data.data.humidity.toFixed(1);
+            
+            const timeStr = `${data.data.date} @ ${data.data.time}`;
+            document.getElementById("last-update").textContent = `Last updated: ${timeStr}`;
+            document.getElementById("last-update-hum").textContent = `Last updated: ${timeStr}`;
+          }
+        } catch (e) {
+          console.error("Failed to load live data:", e);
+        }
+      }
+
+      // 4. Load AI Prediction Data (From Python)
+      async function loadAIPrediction() {
+        try {
+          const res = await fetch("/api/prediction/latest");
+          const data = await res.json();
+          
+          if (data.success && data.data) {
+            const p = data.data;
+            document.getElementById("pred-val").textContent = p.predicted_temp.toFixed(2);
+            document.getElementById("pred-time").textContent = p.for_time;
+            
+            // Format Accuracy %
+            let acc = (p.r2 * 100).toFixed(1);
+            if (acc < 0) acc = 0; 
+            if (acc > 100) acc = 100;
+            document.getElementById("pred-acc").textContent = acc;
+          } else {
+            document.getElementById("pred-time").textContent = "Awaiting Data...";
+          }
+        } catch (e) {
+          console.error("Failed to load AI prediction:", e);
+        }
+      }
+
+      // 5. Load Historical Data (Table & Chart)
+      async function loadHistoricalRecords() {
+        try {
+          const res = await fetch("/api/records");
+          const data = await res.json();
+          if (data.success && data.data) {
+            updateTable(data.data);
+            updateChart(data.data);
+          }
+        } catch (e) {
+          console.error("Failed to load historical data:", e);
+        }
+      }
+
+      // Update Table UI
+      function updateTable(records) {
+        const tbody = document.getElementById("table-body");
+        tbody.innerHTML = "";
+        
+        // Show last 10 records descending
+        const recent = [...records].reverse().slice(0, 10);
+        
+        if(recent.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500">No telemetry data found.</td></tr>`;
           return;
         }
 
-        btn.textContent = "AUTHENTICATING...";
-        btn.disabled = true;
+        recent.forEach(r => {
+          tbody.innerHTML += `
+            <tr class="hover:bg-cyan-900/10 transition-colors">
+              <td class="px-4 py-3">${r.date} ${r.time}</td>
+              <td class="px-4 py-3 text-cyan-400">${parseFloat(r.temperature).toFixed(1)}°C</td>
+              <td class="px-4 py-3 text-blue-400">${parseFloat(r.humidity).toFixed(1)}%</td>
+              <td class="px-4 py-3 text-right">
+                <button onclick="deleteRecord(${r.id})" class="text-red-500 hover:text-red-400 text-xs">DEL</button>
+              </td>
+            </tr>
+          `;
+        });
+      }
 
+      // Delete Record Request
+      async function deleteRecord(id) {
+        if (!confirm("Delete this record?")) return;
+        await fetch(`/api/records/${id}`, { method: "DELETE" });
+        refreshAllData();
+      }
+
+      // 6. Send LCD Command
+      async function updateLCD() {
+        const text = document.getElementById("lcd-input").value.trim();
+        const status = document.getElementById("lcd-status");
+        
+        if (!text) return;
+        
         try {
-          const res = await fetch("/auth/login", {
+          const res = await fetch("/api/lcd-text", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ text })
           });
           const data = await res.json();
-
+          
+          status.classList.remove("hidden");
           if (data.success) {
-            showMsg("Access granted! Redirecting...", "success");
-            setTimeout(() => (window.location.href = "/dashboard"), 1000);
+            status.textContent = "Data Transmitted ✅";
+            status.className = "text-xs mt-3 text-center text-green-400 block";
+            document.getElementById("lcd-input").value = "";
+            setTimeout(() => status.classList.add("hidden"), 3000);
           } else {
-            showMsg(data.message || "Login failed", "error");
-            btn.textContent = "ACCESS SYSTEM";
-            btn.disabled = false;
+            status.textContent = "Error: " + data.message;
+            status.className = "text-xs mt-3 text-center text-red-400 block";
           }
-        } catch (err) {
-          showMsg("Server error occurred.", "error");
-          btn.textContent = "ACCESS SYSTEM";
-          btn.disabled = false;
+        } catch (e) {
+          console.error("LCD Update Failed:", e);
         }
       }
 
-      function showMsg(text, type) {
-        const msg = document.getElementById("msg");
-        msg.textContent = text;
-        msg.className = "mb-4 text-sm rounded px-3 py-2 border";
-        if (type === "error") {
-          msg.style.cssText +=
-            "color:#ff4a4a; border-color:rgba(255,74,74,0.4); background:rgba(255,74,74,0.1);";
-        } else {
-          msg.style.cssText +=
-            "color:#00ffc8; border-color:rgba(0,255,200,0.4); background:rgba(0,255,200,0.1);";
-        }
-        msg.classList.remove("hidden");
+      // 7. Setup Chart.js
+      function initChart() {
+        const ctx = document.getElementById('sensorChart').getContext('2d');
+        Chart.defaults.color = 'rgba(255, 255, 255, 0.4)';
+        Chart.defaults.font.family = '"Share Tech Mono", monospace';
+
+        myChart = new Chart(ctx, {
+          type: 'line',
+          data: { labels: [], datasets: [] },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true, position: 'top' } },
+            scales: {
+              x: { grid: { color: 'rgba(0, 255, 200, 0.05)' } },
+              y: { grid: { color: 'rgba(0, 255, 200, 0.05)' } }
+            },
+            elements: {
+              line: { tension: 0.4, borderWidth: 2 },
+              point: { radius: 0 }
+            }
+          }
+        });
+      }
+
+      // Update Chart with new data
+      function updateChart(records) {
+        // Take last 20 readings for the chart
+        const recent = [...records].slice(-20);
+        
+        const labels = recent.map(r => r.time);
+        const temps = recent.map(r => parseFloat(r.temperature));
+        const hums = recent.map(r => parseFloat(r.humidity));
+
+        myChart.data = {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Temperature (°C)',
+              data: temps,
+              borderColor: '#00ffc8',
+              backgroundColor: 'rgba(0, 255, 200, 0.1)',
+              fill: true
+            },
+            {
+              label: 'Humidity (%)',
+              data: hums,
+              borderColor: '#00a8ff',
+              backgroundColor: 'transparent'
+            }
+          ]
+        };
+        myChart.update();
       }
     </script>
   </body>
-</html> 
+</html>
