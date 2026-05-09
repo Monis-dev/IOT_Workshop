@@ -3,17 +3,24 @@ const path = require("path");
 const app = express();
 
 app.use(express.json());
-app.use(express.static(__dirname)); // Serves the HTML file
+
+// Tell the server to serve the frontend files
+app.use(express.static(__dirname));
 
 let tiltValue = 0;
 
-// Phone sends Gyro data here
+// 1. Explicitly serve the HTML page when you open the URL
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// 2. Phone sends Gyro data here
 app.post("/update", (req, res) => {
   tiltValue = req.body.tilt;
   res.sendStatus(200);
 });
 
-// ESP8266 gets Gyro data from here
+// 3. ESP8266 gets Gyro data from here
 app.get("/get", (req, res) => {
   res.json({ tilt: tiltValue });
 });
