@@ -22,13 +22,24 @@ if (!fs.existsSync(LCD_FILE)) {
   fs.writeFileSync(LCD_FILE, "Hello SISTec!");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Bulletproof DB Helpers ───────────────────────────────────────────────────
 function readDB() {
-  return JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
+  try {
+    const data = fs.readFileSync(DB_FILE, "utf8");
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("DB Read Collision - Preventing Crash");
+    // If file is locked, return empty structure so server doesn't crash
+    return { users: [], sensors: [], predictions: [] };
+  }
 }
 
 function writeDB(data) {
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error("DB Write Collision - Preventing Crash");
+  }
 }
 
 function getKolkataTime() {
@@ -53,6 +64,9 @@ function getKolkataTime() {
 }
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
+// Required for Render to not block login cookies
+app.set("trust proxy", 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -61,7 +75,11 @@ app.use(
     secret: "sistec-iot-secret-2026",
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 },
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production", // auto-detect Render
+      sameSite: "lax",
+    },
   }),
 );
 
@@ -76,9 +94,11 @@ app.post("/auth/register", async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password)
     return res.json({ success: false, message: "All fields are required" });
+
   const db = readDB();
   if (db.users.find((u) => u.email === email))
     return res.json({ success: false, message: "Email already registered" });
+
   const hashed = await bcrypt.hash(password, 10);
   db.users.push({ id: Date.now(), name, email, password: hashed });
   writeDB(db);
@@ -89,8 +109,11 @@ app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
   const db = readDB();
   const user = db.users.find((u) => u.email === email);
-  if (!user || !(await bcrypt.compare(password, user.password)))
+
+  if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.json({ success: false, message: "Invalid email or password" });
+  }
+
   req.session.user = { id: user.id, name: user.name, email: user.email };
   res.json({ success: true, name: user.name });
 });
@@ -134,16 +157,9 @@ app.post("/data/predictions", (req, res) => {
     return res.status(403).json({ success: false, message: "FORBIDDEN" });
 
   const db = readDB();
-  const predictionRecord = {
-    id: Date.now(),
-    predicted_temp,
-    model,
-    mae,
-    r2,
-    predicted_at,
-    for_time,
-  };
-  db.predictions = [predictionRecord];
+  db.predictions = [
+    { id: Date.now(), predicted_temp, model, mae, r2, predicted_at, for_time },
+  ];
   writeDB(db);
   res.json({ success: true, message: "Prediction updated" });
 });
@@ -166,11 +182,11 @@ app.delete("/api/records/:id", requireLogin, (req, res) => {
 app.post("/api/lcd-text", requireLogin, (req, res) => {
   const { text } = req.body;
   if (!text || text.length > 16)
-    return res.json({
-      success: false,
-      message: "Text must be 1-16 characters",
-    });
-  fs.writeFileSync(LCD_FILE, text);
+    return res.json({ success: false, message: "Text must be 1-16 chars" });
+
+  try {
+    fs.writeFileSync(LCD_FILE, text);
+  } catch (e) {}
   res.json({ success: true, message: "LCD text saved" });
 });
 
@@ -179,15 +195,15 @@ app.get("/api/sensor", (req, res) => {
   const { temp, hum, key } = req.query;
   if (key !== "sistec2026") return res.status(403).send("FORBIDDEN");
 
-  // FIX: Protect DB from crashing if the NodeMCU sends empty/invalid values
   const parsedTemp = parseFloat(temp);
   const parsedHum = parseFloat(hum);
   if (isNaN(parsedTemp) || isNaN(parsedHum)) {
-    return res.status(400).send("BAD REQUEST: Invalid sensor values");
+    return res.status(400).send("BAD REQUEST: Invalid values");
   }
 
   const db = readDB();
   const { time, date } = getKolkataTime();
+
   db.sensors.push({
     id: Date.now(),
     temperature: parsedTemp,
@@ -202,7 +218,11 @@ app.get("/api/sensor", (req, res) => {
 });
 
 app.get("/api/lcd", (req, res) => {
-  res.send(fs.readFileSync(LCD_FILE, "utf8"));
+  try {
+    res.send(fs.readFileSync(LCD_FILE, "utf8"));
+  } catch (e) {
+    res.send("Hello SISTec!");
+  }
 });
 
 // ─── Page Routes ──────────────────────────────────────────────────────────────
