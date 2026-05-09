@@ -5,425 +5,332 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard — SISTec IoT 2026</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
   <style>
+    :root {
+      --neon-accent: #00ffc8;
+      --neon-glow: rgba(0, 255, 200, 0.25);
+    }
     * { box-sizing: border-box; }
     body { font-family: 'Share Tech Mono', monospace; background: #0a0f1e; color: #c9d8e8; }
     .orbitron { font-family: 'Orbitron', sans-serif; }
+    
     .grid-bg {
       background-image:
         linear-gradient(rgba(0,255,200,0.025) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0,255,200,0.025) 1px, transparent 1px);
       background-size: 40px 40px;
     }
+
     .card {
-      background: rgba(13,26,46,0.95);
-      border: 1px solid rgba(0,255,200,0.25);
+      background: rgba(13, 26, 46, 0.95);
+      border: 1px solid rgba(0, 255, 200, 0.15);
       border-radius: 1rem;
-      transition: border-color 0.3s, box-shadow 0.3s;
+      transition: all 0.3s ease;
     }
     .card:hover {
-      border-color: rgba(0,255,200,0.6);
-      box-shadow: 0 0 25px rgba(0,255,200,0.15);
+      border-color: var(--neon-accent);
+      box-shadow: 0 0 25px var(--neon-glow);
     }
+
     .big-value {
       font-family: 'Orbitron', sans-serif;
-      font-size: 4rem;
       font-weight: 900;
-      line-height: 1;
-      background: linear-gradient(135deg, #00ffc8, #00a8ff);
+      background: linear-gradient(135deg, var(--neon-accent), #00a8ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
-    .section-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.3em;
-      color: rgba(0,255,200,0.6);
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-    }
-    .navbar {
-      background: rgba(10,15,30,0.98);
-      border-bottom: 1px solid rgba(0,255,200,0.2);
-      backdrop-filter: blur(10px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+
+    /* LCD Styles */
     .lcd-input {
       background: #0d1a2e;
-      border: 1px solid rgba(0,255,200,0.3);
-      color: #00ffc8;
+      border: 1px solid rgba(0, 255, 200, 0.3);
+      color: var(--neon-accent);
       font-family: 'Share Tech Mono', monospace;
       font-size: 1.5rem;
-      letter-spacing: 0.2em;
       border-radius: 0.5rem;
-      padding: 1rem 1.5rem;
+      padding: 1rem;
       width: 100%;
       outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
     }
-    .lcd-input:focus {
-      border-color: rgba(0,255,200,0.8);
-      box-shadow: 0 0 20px rgba(0,255,200,0.2);
-    }
-    .btn-primary {
-      font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(135deg, #00ffc8, #00a8ff);
-      color: #0a0f1e;
-      font-weight: 700;
-      font-size: 0.8rem;
-      letter-spacing: 0.2em;
-      padding: 0.75rem 2rem;
-      border-radius: 0.5rem;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .btn-primary:hover {
-      transform: scale(1.03);
-      box-shadow: 0 0 25px rgba(0,255,200,0.4);
-    }
-    .btn-delete {
-      background: rgba(255,74,74,0.1);
-      border: 1px solid rgba(255,74,74,0.4);
-      color: #ff6b6b;
+
+    .lcd-preview-screen {
+      background: #051405; /* Deep green hardware look */
+      border: 4px solid #1a1a1a;
+      color: #33ff33;
       font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem;
-      padding: 0.3rem 0.8rem;
-      border-radius: 0.25rem;
-      cursor: pointer;
-      transition: all 0.2s;
+      padding: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      box-shadow: inset 0 0 10px #000;
+      min-height: 50px;
     }
-    .btn-delete:hover {
-      background: rgba(255,74,74,0.3);
-      border-color: #ff4a4a;
-    }
-    table { width: 100%; border-collapse: collapse; }
-    th {
-      text-align: left;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      color: rgba(0,255,200,0.5);
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid rgba(0,255,200,0.15);
-    }
-    td {
-      padding: 0.75rem 1rem;
-      font-size: 0.8rem;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      color: #c9d8e8;
-    }
-    tr:hover td { background: rgba(0,255,200,0.03); }
-    .tag-temp {
-      color: #ff9f43;
-      font-weight: bold;
-    }
-    .tag-hum {
-      color: #48dbfb;
-      font-weight: bold;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-    .live-dot {
-      width: 8px; height: 8px;
-      background: #00ffc8;
-      border-radius: 50%;
-      display: inline-block;
-      animation: blink 1.5s infinite;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-in { animation: fadeIn 0.5s ease forwards; }
-    .char-counter {
-      font-size: 0.7rem;
-      color: rgba(0,255,200,0.4);
-      text-align: right;
-      margin-top: 0.25rem;
-    }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #0a0f1e; }
-    ::-webkit-scrollbar-thumb { background: rgba(0,255,200,0.3); border-radius: 3px; }
+
+    .status-msg { display: none; padding: 0.5rem 1rem; border-radius: 0.375rem; border: 1px solid; margin-bottom: 1rem; font-size: 0.875rem; }
+    .status-success { display: block; color: var(--neon-accent); border-color: rgba(0,255,200,0.4); background: rgba(0,255,200,0.1); }
+    .status-error { display: block; color: #ff6b6b; border-color: rgba(255,74,74,0.4); background: rgba(255,74,74,0.1); }
+
+    @keyframes blink { 50% { opacity: 0.2; } }
+    .live-dot { width: 8px; height: 8px; background: var(--neon-accent); border-radius: 50%; animation: blink 1.5s infinite; }
   </style>
 </head>
-<body class="grid-bg min-h-screen">
 
-  <!-- Navbar -->
-  <nav class="navbar px-6 py-4 flex items-center justify-between">
+<body class="grid-bg min-h-screen">
+  <nav class="navbar sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-[rgba(0,255,200,0.2)] bg-[#0a0f1e/98] backdrop-blur-md">
     <div class="flex items-center gap-4">
       <div class="live-dot"></div>
-      <h1 class="orbitron text-sm font-bold" style="color:#00ffc8; letter-spacing:0.15em;">
-        SISTec IoT <span style="color:rgba(0,255,200,0.5)">2026</span>
+      <h1 class="orbitron text-sm font-bold text-[#00ffc8] tracking-widest">
+        SISTec IoT <span class="opacity-50">2026</span>
       </h1>
     </div>
     <div class="flex items-center gap-6">
-      <div class="text-xs" style="color:rgba(0,255,200,0.6)">
-        LOGGED IN: <span id="username" class="orbitron font-bold" style="color:#00ffc8">—</span>
-      </div>
-      <button onclick="logout()"
-        class="text-xs border rounded px-3 py-1 transition-all"
-        style="border-color:rgba(255,74,74,0.4); color:#ff6b6b;"
-        onmouseover="this.style.background='rgba(255,74,74,0.1)'"
-        onmouseout="this.style.background='transparent'">
-        LOGOUT
-      </button>
+      <div class="text-xs opacity-60">LOGGED IN: <span id="username" class="orbitron text-[#00ffc8]">—</span></div>
+      <button onclick="logout()" class="text-xs border border-red-500/40 text-red-400 px-3 py-1 rounded hover:bg-red-500/10 transition-all">LOGOUT</button>
     </div>
   </nav>
 
   <div class="max-w-6xl mx-auto px-4 py-8">
-
-    <!-- ─── SECTION 1: Latest Readings ────────────────────── -->
-    <div class="section-title">⬡ SECTION 1 — LIVE SENSOR READINGS</div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-      <!-- Temperature Card -->
-      <div class="card p-8 fade-in">
-        <div class="flex items-start justify-between mb-6">
-          <div>
-            <p class="text-xs tracking-widest uppercase mb-1" style="color:rgba(255,159,67,0.7)">Temperature</p>
-            <p class="text-xs" style="color:rgba(255,255,255,0.3)">Latest recorded value</p>
-          </div>
-          <div class="text-2xl">🌡️</div>
-        </div>
-        <div class="big-value mb-2" id="temp-value" style="background: linear-gradient(135deg,#ff9f43,#ff6b35); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
-          --
-        </div>
-        <div class="text-lg font-bold mb-4" style="color:rgba(255,159,67,0.7)">°C</div>
-        <div class="text-xs" style="color:rgba(255,255,255,0.3)">
-          🕐 <span id="temp-time">--:-- --</span> &nbsp;|&nbsp; 📅 <span id="temp-date">--</span>
-        </div>
+    <!-- SECTION 1: Live Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div class="card p-8">
+        <p class="text-[0.65rem] tracking-[0.3em] uppercase text-orange-400/70 mb-4">Temperature</p>
+        <div class="big-value text-6xl mb-2" id="temp-value">--</div>
+        <p class="text-sm opacity-40">Degrees Celsius (°C)</p>
+        <div class="mt-4 text-[10px] opacity-40" id="temp-stamp">LAST UPDATED: --:--</div>
       </div>
 
-      <!-- Humidity Card -->
-      <div class="card p-8 fade-in" style="animation-delay:0.1s">
-        <div class="flex items-start justify-between mb-6">
-          <div>
-            <p class="text-xs tracking-widest uppercase mb-1" style="color:rgba(72,219,251,0.7)">Humidity</p>
-            <p class="text-xs" style="color:rgba(255,255,255,0.3)">Latest recorded value</p>
-          </div>
-          <div class="text-2xl">💧</div>
-        </div>
-        <div class="big-value mb-2" id="hum-value">--</div>
-        <div class="text-lg font-bold mb-4" style="color:rgba(72,219,251,0.7)">%</div>
-        <div class="text-xs" style="color:rgba(255,255,255,0.3)">
-          🕐 <span id="hum-time">--:-- --</span> &nbsp;|&nbsp; 📅 <span id="hum-date">--</span>
-        </div>
+      <div class="card p-8">
+        <p class="text-[0.65rem] tracking-[0.3em] uppercase text-cyan-400/70 mb-4">Humidity</p>
+        <div class="big-value text-6xl mb-2" id="hum-value" style="background: linear-gradient(135deg,#48dbfb,#00a8ff); -webkit-background-clip: text;">--</div>
+        <p class="text-sm opacity-40">Relative Humidity (%)</p>
+        <div class="mt-4 text-[10px] opacity-40" id="hum-stamp">LAST UPDATED: --:--</div>
+      </div>
+
+      <div class="card p-8 border-[#00ffc8]/50 shadow-[0_0_15px_rgba(0,255,200,0.1)]">
+        <p class="text-[0.65rem] tracking-[0.3em] uppercase text-[#00ffc8] mb-4">AI Prediction (T+5)</p>
+        <div class="big-value text-6xl mb-2" id="pred-value">--</div>
+        <p class="text-sm opacity-40">Projected Temp at <span id="pred-time">--:--</span></p>
+        <div class="mt-4 text-[10px] text-[#00ffc8]/60">CONFIDENCE: <span id="pred-acc">--</span>%</div>
       </div>
     </div>
 
-    <!-- ─── SECTION 2: LCD Text ────────────────────────────── -->
-    <div class="section-title">⬡ SECTION 2 — LCD DISPLAY CONTROL</div>
+    <!-- Graph Section -->
+    <div class="card p-6 mb-10">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="orbitron text-xs tracking-widest opacity-70">⬡ SENSOR TELEMETRY & TRENDS</h3>
+        <button onclick="refreshAll()" class="text-[10px] text-[#00ffc8]/60 hover:text-[#00ffc8]">REFRESH DATA</button>
+      </div>
+      <div class="h-64"><canvas id="sensorChart"></canvas></div>
+    </div>
 
-    <div class="card p-8 mb-10 fade-in" style="animation-delay:0.2s">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="text-xl">📺</div>
-        <div>
-          <p class="text-white font-bold text-sm">Send Text to 16×2 LCD</p>
-          <p class="text-xs" style="color:rgba(255,255,255,0.3)">Maximum 16 characters. Text will appear on LCD display via ESP8266.</p>
+    <!-- LCD Section -->
+    <div class="card p-8 mb-10">
+      <h3 class="orbitron text-xs tracking-widest opacity-70 mb-6">⬡ REMOTE LCD OVERRIDE</h3>
+      <div id="lcd-msg" class="status-msg"></div>
+      
+      <div class="lcd-preview-screen mb-4">
+        <div class="text-[8px] opacity-30 mb-1">16x2 PHYSICAL DISPLAY PREVIEW</div>
+        <span id="lcd-preview">READY_SYSTEM_...</span>
+      </div>
+
+      <div class="relative">
+        <input id="lcd-text" type="text" maxlength="16" class="lcd-input" placeholder="Type message..." oninput="updatePreview(this.value)">
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] opacity-40">
+          <span id="char-count">0</span>/16
         </div>
       </div>
-
-      <div id="lcd-msg" class="hidden mb-4 text-sm rounded px-3 py-2 border"></div>
-
-      <!-- LCD Preview Box -->
-      <div class="mb-4 p-3 rounded border text-xs" style="background:#000; border-color:rgba(0,255,200,0.2); color:#00ff00; font-family:'Share Tech Mono'; letter-spacing:0.15em; min-height:3rem;">
-        <div style="color:rgba(0,255,0,0.4); font-size:0.6rem; margin-bottom:4px;">LCD PREVIEW</div>
-        <span id="lcd-preview">________________</span>
-      </div>
-
-      <input id="lcd-text" type="text" maxlength="16"
-        class="lcd-input mb-1" placeholder="Type up to 16 chars..."
-        oninput="updatePreview(this.value)"
-      />
-      <div class="char-counter"><span id="char-count">0</span>/16 characters</div>
-
-      <div class="mt-4">
-        <button onclick="sendLCD()" class="btn-primary">
-          📤 SEND TO LCD
+      
+      <div class="mt-6 flex gap-4">
+        <button onclick="sendLCD()" class="bg-gradient-to-r from-[#00ffc8] to-[#00a8ff] text-black font-bold orbitron text-[10px] px-8 py-3 rounded hover:scale-105 transition-transform">
+          PUSH TO HARDWARE
         </button>
+        <button onclick="clearLCD()" class="text-[10px] opacity-50 hover:opacity-100">CLEAR</button>
       </div>
     </div>
 
-    <!-- ─── SECTION 3: Records Table ──────────────────────── -->
-    <div class="section-title">⬡ SECTION 3 — SENSOR DATA RECORDS</div>
-
-    <div class="card fade-in" style="animation-delay:0.3s; overflow:hidden;">
-      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b" style="border-color:rgba(0,255,200,0.1)">
-        <p class="text-white text-sm font-bold">All Temperature & Humidity Records</p>
-        <button onclick="loadRecords()" class="text-xs" style="color:rgba(0,255,200,0.6)"
-          onmouseover="this.style.color='#00ffc8'" onmouseout="this.style.color='rgba(0,255,200,0.6)'">
-          ↻ REFRESH
-        </button>
+    <!-- Table Section -->
+    <div class="card overflow-hidden">
+      <div class="p-6 border-b border-white/5 flex justify-between items-center">
+        <h3 class="orbitron text-xs tracking-widest opacity-70">⬡ HISTORICAL LOGS</h3>
       </div>
-
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-white/5 text-[#00ffc8]/50 uppercase tracking-tighter">
             <tr>
-              <th>#</th>
-              <th>TEMPERATURE</th>
-              <th>HUMIDITY</th>
-              <th>TIME</th>
-              <th>DATE</th>
-              <th>ACTION</th>
+              <th class="p-4">Timestamp</th>
+              <th class="p-4">Temp</th>
+              <th class="p-4">Humidity</th>
+              <th class="p-4">Action</th>
             </tr>
           </thead>
-          <tbody id="records-tbody">
-            <tr>
-              <td colspan="6" class="text-center py-10" style="color:rgba(255,255,255,0.3)">
-                Loading records...
-              </td>
-            </tr>
+          <tbody id="records-tbody" class="divide-y divide-white/5">
+            <!-- Data injected here -->
           </tbody>
         </table>
       </div>
     </div>
-
-  </div>
-
-  <div class="text-center py-6 text-xs" style="color:rgba(0,255,200,0.15)">
-    SISTec IoT Application © 2026 &nbsp;|&nbsp; Asia/Kolkata (UTC+5:30)
   </div>
 
   <script>
-    // ── Auth check ──────────────────────────────────────────
-    fetch('/auth/me').then(r => r.json()).then(d => {
-      if (!d.loggedIn) {
-        window.location.href = '/';
+    let myChart = null;
+    let latestPredictionTemp = null;
+
+    // Initialization
+    window.onload = async () => {
+      const auth = await fetch('/auth/me').then(r => r.json()).catch(() => ({loggedIn: false}));
+      if (!auth.loggedIn) {
+        // window.location.href = '/'; // Uncomment in production
+        document.getElementById('username').textContent = "GUEST_USER";
       } else {
-        document.getElementById('username').textContent = d.user.name.toUpperCase();
-        loadLatest();
-        loadRecords();
+        document.getElementById('username').textContent = auth.user.name.toUpperCase();
       }
-    });
+      initChart();
+      refreshAll();
+    };
 
-    // ── Logout ──────────────────────────────────────────────
-    async function logout() {
-      await fetch('/auth/logout', { method: 'POST' });
-      window.location.href = '/';
-    }
-
-    // ── LCD Preview ─────────────────────────────────────────
-    function updatePreview(val) {
-      const preview = document.getElementById('lcd-preview');
-      document.getElementById('char-count').textContent = val.length;
-      if (!val) {
-        preview.textContent = '________________';
-        preview.style.color = 'rgba(0,255,0,0.3)';
-      } else {
-        // Pad to 16 chars for LCD look
-        preview.textContent = val.padEnd(16, ' ');
-        preview.style.color = '#00ff00';
-      }
-    }
-
-    // ── Send LCD Text ────────────────────────────────────────
-    async function sendLCD() {
-      const text = document.getElementById('lcd-text').value.trim();
-      if (!text) {
-        showLCDMsg('Please enter text to send', 'error');
-        return;
-      }
-
-      const res = await fetch('/api/lcd-text', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
+    function initChart() {
+      const ctx = document.getElementById('sensorChart').getContext('2d');
+      myChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: [], datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { family: 'Share Tech Mono' } } },
+            x: { grid: { display: false } }
+          },
+          plugins: { legend: { display: false } }
+        }
       });
-      const data = await res.json();
+    }
 
-      if (data.success) {
-        showLCDMsg('✓ Text saved! LCD will update on next ESP8266 request.', 'success');
-      } else {
-        showLCDMsg(data.message || 'Failed to save', 'error');
+    async function refreshAll() {
+      try {
+        const [latestRes, predRes, logsRes] = await Promise.all([
+          fetch('/api/latest').then(r => r.json()),
+          fetch('/api/prediction/latest').then(r => r.json()),
+          fetch('/api/records').then(r => r.json())
+        ]);
+
+        if (latestRes.success) updateLiveCards(latestRes.data);
+        if (predRes.success) updatePrediction(predRes.data);
+        if (logsRes.success) updateLogs(logsRes.data);
+      } catch (e) {
+        console.error("Sync failed", e);
       }
     }
 
-    function showLCDMsg(text, type) {
-      const el = document.getElementById('lcd-msg');
-      el.textContent = text;
-      el.classList.remove('hidden');
-      if (type === 'error') {
-        el.style.cssText = 'display:block; color:#ff4a4a; border-color:rgba(255,74,74,0.4); background:rgba(255,74,74,0.1); margin-bottom:1rem; font-size:0.875rem; border-radius:0.375rem; padding:0.5rem 0.75rem; border:1px solid;';
-      } else {
-        el.style.cssText = 'display:block; color:#00ffc8; border-color:rgba(0,255,200,0.4); background:rgba(0,255,200,0.1); margin-bottom:1rem; font-size:0.875rem; border-radius:0.375rem; padding:0.5rem 0.75rem; border:1px solid;';
-      }
-      setTimeout(() => el.classList.add('hidden'), 4000);
+    function updateLiveCards(data) {
+      document.getElementById('temp-value').textContent = data.temperature;
+      document.getElementById('hum-value').textContent = data.humidity;
+      document.getElementById('temp-stamp').textContent = `LAST UPDATED: ${data.time}`;
+      document.getElementById('hum-stamp').textContent = `LAST UPDATED: ${data.time}`;
     }
 
-    // ── Load Latest Sensor ────────────────────────────────────
-    async function loadLatest() {
-      const res = await fetch('/api/latest');
-      const data = await res.json();
-
-      if (data.success && data.data) {
-        const d = data.data;
-        document.getElementById('temp-value').textContent = d.temperature;
-        document.getElementById('hum-value').textContent = d.humidity;
-        document.getElementById('temp-time').textContent = d.time;
-        document.getElementById('temp-date').textContent = d.date;
-        document.getElementById('hum-time').textContent = d.time;
-        document.getElementById('hum-date').textContent = d.date;
-      } else {
-        document.getElementById('temp-value').textContent = 'N/A';
-        document.getElementById('hum-value').textContent = 'N/A';
-      }
+    function updatePrediction(p) {
+      latestPredictionTemp = parseFloat(p.predicted_temp);
+      document.getElementById('pred-value').textContent = latestPredictionTemp.toFixed(1);
+      document.getElementById('pred-time').textContent = p.for_time;
+      let acc = Math.max(0, Math.min(100, (p.r2 * 100)));
+      document.getElementById('pred-acc').textContent = acc.toFixed(1);
     }
 
-    // ── Load Records Table ────────────────────────────────────
-    async function loadRecords() {
-      const res = await fetch('/api/records');
-      const data = await res.json();
+    function updateLogs(records) {
       const tbody = document.getElementById('records-tbody');
-
-      if (!data.success || data.data.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" class="text-center py-10" style="color:rgba(255,255,255,0.3)">
-              No records found. Waiting for ESP8266 data...
-            </td>
-          </tr>`;
-        return;
-      }
-
-      // Show newest first
-      const records = [...data.data].reverse();
-      tbody.innerHTML = records.map((r, i) => `
-        <tr>
-          <td style="color:rgba(255,255,255,0.4)">${i + 1}</td>
-          <td><span class="tag-temp">${r.temperature} °C</span></td>
-          <td><span class="tag-hum">${r.humidity} %</span></td>
-          <td style="color:rgba(255,255,255,0.6)">${r.time}</td>
-          <td style="color:rgba(255,255,255,0.6)">${r.date}</td>
-          <td>
-            <button class="btn-delete" onclick="deleteRecord(${r.id})">DELETE</button>
-          </td>
+      const recent = records.slice(-15); // Last 15 for the chart
+      
+      // Update Table (Newest first)
+      tbody.innerHTML = [...records].reverse().map(r => `
+        <tr class="hover:bg-white/5 transition-colors">
+          <td class="p-4 opacity-60">${r.date} ${r.time}</td>
+          <td class="p-4 text-orange-400">${r.temperature}°C</td>
+          <td class="p-4 text-cyan-400">${r.humidity}%</td>
+          <td class="p-4"><button onclick="deleteRecord(${r.id})" class="text-red-500/50 hover:text-red-500">DELETE</button></td>
         </tr>
       `).join('');
+
+      updateChartData(recent);
     }
 
-    // ── Delete Record ─────────────────────────────────────────
+    function updateChartData(recent) {
+      const labels = recent.map(r => r.time);
+      const temps = recent.map(r => parseFloat(r.temperature));
+      
+      // Create a prediction dataset that connects to the last point
+      const predData = new Array(temps.length - 1).fill(null);
+      predData.push(temps[temps.length - 1]); // Last actual
+      predData.push(latestPredictionTemp);   // Predicted
+
+      myChart.data.labels = [...labels, 'T+5'];
+      myChart.data.datasets = [
+        {
+          label: 'Actual Temp',
+          data: temps,
+          borderColor: '#00ffc8',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.3
+        },
+        {
+          label: 'Prediction',
+          data: predData,
+          borderColor: '#ff9f43',
+          borderDash: [5, 5],
+          borderWidth: 2,
+          pointRadius: 4,
+          fill: false
+        }
+      ];
+      myChart.update();
+    }
+
+    function updatePreview(val) {
+      document.getElementById('char-count').textContent = val.length;
+      document.getElementById('lcd-preview').textContent = val || "READY_SYSTEM_...";
+    }
+
+    async function sendLCD() {
+      const text = document.getElementById('lcd-text').value;
+      const el = document.getElementById('lcd-msg');
+      
+      try {
+        const res = await fetch('/api/lcd-text', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const data = await res.json();
+        
+        el.textContent = data.success ? "✓ UPLOAD SUCCESSFUL" : "× UPLOAD FAILED";
+        el.className = `status-msg ${data.success ? 'status-success' : 'status-error'}`;
+      } catch (e) {
+        el.textContent = "× NETWORK ERROR";
+        el.className = "status-msg status-error";
+      }
+      setTimeout(() => el.className = "status-msg", 3000);
+    }
+
+    function clearLCD() {
+      document.getElementById('lcd-text').value = "";
+      updatePreview("");
+    }
+
     async function deleteRecord(id) {
-      if (!confirm('Delete this record?')) return;
-      const res = await fetch(`/api/records/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        loadRecords();
-        loadLatest();
+      if(confirm('Delete log entry?')) {
+        await fetch(`/api/records/${id}`, { method: 'DELETE' });
+        refreshAll();
       }
     }
 
-    // Auto-refresh every 30 seconds
-    setInterval(() => {
-      loadLatest();
-      loadRecords();
-    }, 30000);
+    async function logout() {
+      await fetch('/auth/logout', { method: 'POST' });
+      window.location.reload();
+    }
+
+    // Auto-refresh every 60 seconds
+    setInterval(refreshAll, 60000);
   </script>
 </body>
 </html>

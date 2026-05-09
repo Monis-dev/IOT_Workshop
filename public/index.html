@@ -1,383 +1,53 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard — SISTec IoT 2026</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js for graphs -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluid Controller</title>
     <style>
-      body {
-        font-family: "Share Tech Mono", monospace;
-        background: #0a0f1e;
-        color: #e2e8f0;
-      }
-      .orbitron {
-        font-family: "Orbitron", sans-serif;
-      }
-      .grid-bg {
-        background-image:
-          linear-gradient(rgba(0, 255, 200, 0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(0, 255, 200, 0.03) 1px, transparent 1px);
-        background-size: 40px 40px;
-      }
-      .glow-box {
-        background: rgba(13, 26, 46, 0.95);
-        border: 1px solid rgba(0, 255, 200, 0.3);
-        box-shadow: 0 0 15px rgba(0, 255, 200, 0.1);
-        backdrop-filter: blur(5px);
-        transition: all 0.3s ease;
-      }
-      .glow-box:hover {
-        border-color: rgba(0, 255, 200, 0.6);
-        box-shadow: 0 0 20px rgba(0, 255, 200, 0.2);
-      }
-      .glow-text {
-        text-shadow: 0 0 10px rgba(0, 255, 200, 0.8);
-      }
-      .neon-text-gradient {
-        background: linear-gradient(135deg, #00ffc8, #00a8ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar { width: 6px; height: 6px; }
-      ::-webkit-scrollbar-track { background: #0a0f1e; }
-      ::-webkit-scrollbar-thumb { background: #00ffc8; border-radius: 3px; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #0f172a; color: white; margin: 0; }
+        button { padding: 20px 40px; font-size: 20px; background: #0ea5e9; color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4); }
+        h1 { font-size: 4rem; margin: 20px 0; color: #38bdf8; }
     </style>
-  </head>
-  
-  <body class="grid-bg min-h-screen p-4 md:p-8">
-    
-    <!-- Top Navigation -->
-    <header class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-      <div>
-        <h1 class="orbitron text-2xl font-black text-white glow-text" style="color: #00ffc8;">
-          SISTec IoT <span class="text-white">2026</span>
-        </h1>
-        <p class="text-xs text-cyan-400 tracking-widest uppercase mt-1">Command Center</p>
-      </div>
-      <div class="flex items-center gap-6">
-        <div class="text-sm">
-          <span class="text-gray-500">USER://</span> 
-          <span id="username" class="text-white font-bold tracking-wider">LOADING...</span>
-        </div>
-        <button onclick="logout()" class="text-xs border border-red-500 text-red-500 px-4 py-2 rounded hover:bg-red-500 hover:text-white transition-colors duration-300">
-          TERMINATE SESSION
-        </button>
-      </div>
-    </header>
+</head>
+<body>
+    <button id="btn" onclick="startGyro()">CONNECT GYROSCOPE</button>
+    <h1 id="tilt-display">0°</h1>
+    <p>Tilt your phone left and right</p>
 
-    <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-      
-      <!-- 1. Temperature Card -->
-      <div class="glow-box rounded-xl p-6">
-        <div class="flex justify-between items-start mb-2">
-          <p class="text-xs tracking-widest uppercase" style="color: #00ffc8;">Live Temperature</p>
-          <span class="text-2xl">🌡️</span>
-        </div>
-        <div class="flex items-end gap-2">
-          <span id="temp-val" class="orbitron text-4xl font-bold neon-text-gradient">--</span>
-          <span class="text-lg font-bold" style="color: #00ffc8;">°C</span>
-        </div>
-        <p id="last-update" class="text-xs text-gray-500 mt-4">Last updated: --</p>
-      </div>
-
-      <!-- 2. Humidity Card -->
-      <div class="glow-box rounded-xl p-6">
-        <div class="flex justify-between items-start mb-2">
-          <p class="text-xs tracking-widest uppercase text-blue-400">Live Humidity</p>
-          <span class="text-2xl">💧</span>
-        </div>
-        <div class="flex items-end gap-2">
-          <span id="hum-val" class="orbitron text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">--</span>
-          <span class="text-lg font-bold text-blue-400">%</span>
-        </div>
-        <p id="last-update-hum" class="text-xs text-gray-500 mt-4">Last updated: --</p>
-      </div>
-
-      <!-- 3. AI Prediction Card -->
-      <div class="glow-box rounded-xl p-6" style="border-color: rgba(0, 255, 200, 0.6); box-shadow: 0 0 20px rgba(0, 255, 200, 0.15);">
-        <div class="flex justify-between items-start mb-2">
-          <div>
-            <p class="text-xs tracking-widest uppercase" style="color: #00ffc8;">AI Prediction (T+5)</p>
-            <p class="text-[10px] text-gray-500">Linear Regression</p>
-          </div>
-          <span class="text-2xl animate-pulse">🤖</span>
-        </div>
-        <div class="flex items-end gap-2">
-          <span id="pred-val" class="orbitron text-4xl font-bold neon-text-gradient">--</span>
-          <span class="text-lg font-bold" style="color: #00ffc8;">°C</span>
-        </div>
-        <p class="text-xs mt-3 text-gray-400">
-          🔮 For: <span id="pred-time" style="color: #00ffc8;">--:--</span> | Acc: <span id="pred-acc">--</span>%
-        </p>
-      </div>
-
-      <!-- 4. LCD Control Panel -->
-      <div class="glow-box rounded-xl p-6 md:col-span-1">
-        <h3 class="orbitron text-sm font-bold mb-4" style="color: #00ffc8;">LCD DISPLAY OVERRIDE</h3>
-        <p class="text-xs text-gray-400 mb-4">Transmit text directly to hardware (Max 16 chars).</p>
-        
-        <input 
-          type="text" 
-          id="lcd-input" 
-          maxlength="16" 
-          placeholder="ENTER COMMAND..."
-          class="w-full bg-[#0a0f1e] border border-cyan-800 rounded px-3 py-2 text-sm text-cyan-400 outline-none focus:border-cyan-400 mb-4 uppercase"
-        />
-        <button onclick="updateLCD()" class="w-full py-2 bg-cyan-900/40 border border-cyan-500 text-cyan-400 text-xs tracking-widest uppercase hover:bg-cyan-500 hover:text-[#0a0f1e] transition-colors rounded">
-          TRANSMIT DATA
-        </button>
-        <p id="lcd-status" class="text-xs mt-3 text-center hidden"></p>
-      </div>
-
-      <!-- 5. Chart area -->
-      <div class="glow-box rounded-xl p-6 md:col-span-2">
-        <h3 class="orbitron text-sm font-bold mb-4" style="color: #00ffc8;">SYSTEM TELEMETRY</h3>
-        <div class="w-full h-48 relative">
-          <canvas id="sensorChart"></canvas>
-        </div>
-      </div>
-
-      <!-- 6. Data Table -->
-      <div class="glow-box rounded-xl p-6 md:col-span-3">
-        <h3 class="orbitron text-sm font-bold mb-4" style="color: #00ffc8;">DATA LOGS</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm whitespace-nowrap">
-            <thead class="text-xs tracking-widest text-cyan-600 uppercase border-b border-cyan-900">
-              <tr>
-                <th class="px-4 py-3">Timestamp</th>
-                <th class="px-4 py-3">Temp (°C)</th>
-                <th class="px-4 py-3">Hum (%)</th>
-                <th class="px-4 py-3 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody id="table-body" class="text-gray-300 divide-y divide-cyan-900/30">
-              <!-- JS Populated -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-    </main>
-
-    <!-- App Logic -->
     <script>
-      let myChart; // Chart instance
+        let lastSendTime = 0;
 
-      // 1. Authentication Check
-      fetch("/auth/me")
-        .then(res => res.json())
-        .then(data => {
-          if (!data.loggedIn) {
-            window.location.href = "/"; // Redirect if not logged in
-          } else {
-            document.getElementById("username").textContent = data.user.name.toUpperCase();
-            initDashboard();
-          }
-        });
-
-      // Logout Function
-      async function logout() {
-        await fetch("/auth/logout", { method: "POST" });
-        window.location.href = "/";
-      }
-
-      // 2. Initialize Dashboard
-      function initDashboard() {
-        initChart();
-        refreshAllData();
-        
-        // Auto-refresh every 30 seconds
-        setInterval(refreshAllData, 30000);
-      }
-
-      function refreshAllData() {
-        loadLatestSensorData();
-        loadHistoricalRecords();
-        loadAIPrediction();
-      }
-
-      // 3. Load Current Sensor Readings
-      async function loadLatestSensorData() {
-        try {
-          const res = await fetch("/api/latest");
-          const data = await res.json();
-          if (data.success && data.data) {
-            document.getElementById("temp-val").textContent = data.data.temperature.toFixed(1);
-            document.getElementById("hum-val").textContent = data.data.humidity.toFixed(1);
-            
-            const timeStr = `${data.data.date} @ ${data.data.time}`;
-            document.getElementById("last-update").textContent = `Last updated: ${timeStr}`;
-            document.getElementById("last-update-hum").textContent = `Last updated: ${timeStr}`;
-          }
-        } catch (e) {
-          console.error("Failed to load live data:", e);
-        }
-      }
-
-      // 4. Load AI Prediction Data (From Python)
-      async function loadAIPrediction() {
-        try {
-          const res = await fetch("/api/prediction/latest");
-          const data = await res.json();
-          
-          if (data.success && data.data) {
-            const p = data.data;
-            document.getElementById("pred-val").textContent = p.predicted_temp.toFixed(2);
-            document.getElementById("pred-time").textContent = p.for_time;
-            
-            // Format Accuracy %
-            let acc = (p.r2 * 100).toFixed(1);
-            if (acc < 0) acc = 0; 
-            if (acc > 100) acc = 100;
-            document.getElementById("pred-acc").textContent = acc;
-          } else {
-            document.getElementById("pred-time").textContent = "Awaiting Data...";
-          }
-        } catch (e) {
-          console.error("Failed to load AI prediction:", e);
-        }
-      }
-
-      // 5. Load Historical Data (Table & Chart)
-      async function loadHistoricalRecords() {
-        try {
-          const res = await fetch("/api/records");
-          const data = await res.json();
-          if (data.success && data.data) {
-            updateTable(data.data);
-            updateChart(data.data);
-          }
-        } catch (e) {
-          console.error("Failed to load historical data:", e);
-        }
-      }
-
-      // Update Table UI
-      function updateTable(records) {
-        const tbody = document.getElementById("table-body");
-        tbody.innerHTML = "";
-        
-        // Show last 10 records descending
-        const recent = [...records].reverse().slice(0, 10);
-        
-        if(recent.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500">No telemetry data found.</td></tr>`;
-          return;
-        }
-
-        recent.forEach(r => {
-          tbody.innerHTML += `
-            <tr class="hover:bg-cyan-900/10 transition-colors">
-              <td class="px-4 py-3">${r.date} ${r.time}</td>
-              <td class="px-4 py-3 text-cyan-400">${parseFloat(r.temperature).toFixed(1)}°C</td>
-              <td class="px-4 py-3 text-blue-400">${parseFloat(r.humidity).toFixed(1)}%</td>
-              <td class="px-4 py-3 text-right">
-                <button onclick="deleteRecord(${r.id})" class="text-red-500 hover:text-red-400 text-xs">DEL</button>
-              </td>
-            </tr>
-          `;
-        });
-      }
-
-      // Delete Record Request
-      async function deleteRecord(id) {
-        if (!confirm("Delete this record?")) return;
-        await fetch(`/api/records/${id}`, { method: "DELETE" });
-        refreshAllData();
-      }
-
-      // 6. Send LCD Command
-      async function updateLCD() {
-        const text = document.getElementById("lcd-input").value.trim();
-        const status = document.getElementById("lcd-status");
-        
-        if (!text) return;
-        
-        try {
-          const res = await fetch("/api/lcd-text", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text })
-          });
-          const data = await res.json();
-          
-          status.classList.remove("hidden");
-          if (data.success) {
-            status.textContent = "Data Transmitted ✅";
-            status.className = "text-xs mt-3 text-center text-green-400 block";
-            document.getElementById("lcd-input").value = "";
-            setTimeout(() => status.classList.add("hidden"), 3000);
-          } else {
-            status.textContent = "Error: " + data.message;
-            status.className = "text-xs mt-3 text-center text-red-400 block";
-          }
-        } catch (e) {
-          console.error("LCD Update Failed:", e);
-        }
-      }
-
-      // 7. Setup Chart.js
-      function initChart() {
-        const ctx = document.getElementById('sensorChart').getContext('2d');
-        Chart.defaults.color = 'rgba(255, 255, 255, 0.4)';
-        Chart.defaults.font.family = '"Share Tech Mono", monospace';
-
-        myChart = new Chart(ctx, {
-          type: 'line',
-          data: { labels: [], datasets: [] },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true, position: 'top' } },
-            scales: {
-              x: { grid: { color: 'rgba(0, 255, 200, 0.05)' } },
-              y: { grid: { color: 'rgba(0, 255, 200, 0.05)' } }
-            },
-            elements: {
-              line: { tension: 0.4, borderWidth: 2 },
-              point: { radius: 0 }
+        async function startGyro() {
+            // Request permission for iOS devices
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                const permission = await DeviceOrientationEvent.requestPermission();
+                if (permission !== 'granted') return alert("Permission denied!");
             }
-          }
-        });
-      }
+            
+            document.getElementById('btn').style.display = 'none';
 
-      // Update Chart with new data
-      function updateChart(records) {
-        // Take last 20 readings for the chart
-        const recent = [...records].slice(-20);
-        
-        const labels = recent.map(r => r.time);
-        const temps = recent.map(r => parseFloat(r.temperature));
-        const hums = recent.map(r => parseFloat(r.humidity));
+            window.addEventListener("deviceorientation", (event) => {
+                let tilt = Math.round(event.gamma || 0); // Left/Right tilt
+                
+                // Limit tilt range to -45 to 45 degrees
+                if (tilt > 45) tilt = 45;
+                if (tilt < -45) tilt = -45;
 
-        myChart.data = {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Temperature (°C)',
-              data: temps,
-              borderColor: '#00ffc8',
-              backgroundColor: 'rgba(0, 255, 200, 0.1)',
-              fill: true
-            },
-            {
-              label: 'Humidity (%)',
-              data: hums,
-              borderColor: '#00a8ff',
-              backgroundColor: 'transparent'
-            }
-          ]
-        };
-        myChart.update();
-      }
+                document.getElementById('tilt-display').innerText = tilt + "°";
+
+                // THROTTLE: Only send data to Render once every 250ms
+                const now = Date.now();
+                if (now - lastSendTime > 250) {
+                    lastSendTime = now;
+                    fetch('/update', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tilt: tilt })
+                    }).catch(e => console.log("Network error"));
+                }
+            });
+        }
     </script>
-  </body>
+</body>
 </html>
